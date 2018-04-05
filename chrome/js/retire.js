@@ -5,7 +5,7 @@
  */
 
 var exports = exports || {};
-exports.version = '1.5.0';
+exports.version = '2.0.0-beta.8';
 
 function isDefined(o) {
 	return typeof o !== 'undefined';
@@ -77,7 +77,7 @@ function check(results, repo) {
 				if (isDefined(vulns[i].atOrAbove) && !isAtOrAbove(result.version, vulns[i].atOrAbove)) {
 					continue;
 				}
-				var vulnerability = { info : vulns[i].info };
+				var vulnerability = { info : vulns[i].info, below: vulns[i].below, atOrAbove: vulns[i].atOrAbove };
 				if (vulns[i].severity) {
 					vulnerability.severity = vulns[i].severity;
 				}
@@ -162,12 +162,12 @@ exports.scanFileContent = function(content, repo, hasher) {
 	return check(result, repo);
 };
 
-exports.scanNodeDependency = function(dependency, npmrepo) {
+exports.scanNodeDependency = function(dependency, npmrepo, options) {
 	if (!isDefined(dependency.version)) {
-		console.warn('Missing version for ' + dependency.component + '. Need to run npm install ?');
+		if (options.log) options.log.warn('Missing version for ' + dependency.component + '. Need to run npm install ?');
 		return [];
 	}
-	if (!isDefined(npmrepo[dependency.component])) return [{component: dependency.component, version: dependency.version}];
+	if (!isDefined(npmrepo[dependency.component])) return [{component: dependency.component, version: dependency.version, file: dependency.file}];
 	return check([dependency], npmrepo);
 };
 
