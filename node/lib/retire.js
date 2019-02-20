@@ -4,7 +4,7 @@
  */
 
 var exports = exports || {};
-exports.version = '2.0.0-beta.13';
+exports.version = '2.0.2';
 
 function isDefined(o) {
 	return typeof o !== 'undefined';
@@ -159,12 +159,13 @@ exports.scanFileName = function(fileName, repo) {
 };
 
 exports.scanFileContent = function(content, repo, hasher) {
-	var result = scan(content, 'filecontent', repo);
+	var normalizedContent = content.toString().replace(/(\r\n|\r)/g, "\n");
+	var result = scan(normalizedContent, 'filecontent', repo);
 	if (result.length === 0) {
-		result = scan(content, 'filecontentreplace', repo, replacementMatch);
+		result = scan(normalizedContent, 'filecontentreplace', repo, replacementMatch);
 	}
 	if (result.length === 0) {
-		result = scanhash(hasher.sha1(content), repo);
+		result = scanhash(hasher.sha1(normalizedContent), repo);
 	}
 	return check(result, repo);
 };
